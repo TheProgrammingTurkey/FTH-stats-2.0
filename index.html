@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Screen</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        h1 {
+            font-size: 50px;
+        }
+        .button-container {
+            display: flex;
+            gap: 15px;
+        }
+        .button {
+            text-align: center;
+            width: 200px;
+            padding: 20px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 40px;
+            cursor: pointer;
+            margin-bottom: 200px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>FTH Stats 2.0</h1>
+    <div class="button-container">
+        <a href="heatmap.html" class="button">Heatmap</a>
+        <a href="goalie.html" class="button">Goalie Stats</a>
+    </div>
+</body>
+</html>
