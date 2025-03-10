@@ -123,10 +123,7 @@ function draw() {
     ctx.fillText(Math.round(redZoneShots*10000/shots.length)/100 + "% of shots", (redZone.geometry.coordinates[0][0][0]-leftMargin+redZone.geometry.coordinates[0][3][0]-leftMargin)/2,(redZone.geometry.coordinates[0][3][1]-topMargin+redZone.geometry.coordinates[0][2][1]-topMargin)/2-10);
     ctx.fillText(Math.round(bigRedZoneShots*10000/shots.length)/100 + "% of shots", (bigRedZone.geometry.coordinates[0][0][0]-leftMargin+bigRedZone.geometry.coordinates[0][3][0]-leftMargin)/2+30,(bigRedZone.geometry.coordinates[0][3][1]-topMargin+bigRedZone.geometry.coordinates[0][2][1]-topMargin)/2-60);
   }
-  if(shots.length == 0){
-    ctx.fillText("No Goals have been scored", (redZone.geometry.coordinates[0][0][0]-leftMargin+redZone.geometry.coordinates[0][3][0]-leftMargin)/2,(redZone.geometry.coordinates[0][3][1]-topMargin+redZone.geometry.coordinates[0][2][1]-topMargin)/2-10);
-  }
-  else{
+  if(goals.length != 0){
     ctx.fillText(Math.round(redZoneGoals*10000/goals.length)/100 + "% of goals", (redZone.geometry.coordinates[0][0][0]-leftMargin+redZone.geometry.coordinates[0][3][0]-leftMargin)/2,(redZone.geometry.coordinates[0][3][1]-topMargin+redZone.geometry.coordinates[0][2][1]-topMargin)/2+10);
     ctx.fillText(Math.round(bigRedZoneGoals*10000/goals.length)/100 + "% of goals", (bigRedZone.geometry.coordinates[0][0][0]-leftMargin+bigRedZone.geometry.coordinates[0][3][0]-leftMargin)/2+30,(bigRedZone.geometry.coordinates[0][3][1]-topMargin+bigRedZone.geometry.coordinates[0][2][1]-topMargin)/2+60);
   }
@@ -180,7 +177,20 @@ function undo(){
     return;
   }
   addToHeatmap(shots[shots.length-1][0], shots[shots.length-1][1], -1);
+  if(goals.length > 0 && shots[shots.length-1][0] == goals[goals.length-1][0] && shots[shots.length-1][1] == goals[goals.length-1][1]){
+    oldGoals.push([goals[goals.length-1][0], goals[goals.length-1][1]]);
+  }
   oldShots.push([shots[shots.length-1][0], shots[shots.length-1][1]]);
+  if(goals.length > 0 && shots[shots.length-1][0] == goals[goals.length-1][0] && shots[shots.length-1][1] == goals[goals.length-1][1]){
+    goals.pop();
+    if(turf.booleanPointInPolygon(turf.point([shots[shots.length-1][0], shots[shots.length-1][1]]), redZone)){
+      redZoneGoals--;
+      bigRedZoneGoals--;
+    }
+    else if(turf.booleanPointInPolygon(turf.point([shots[shots.length-1][0], shots[shots.length-1][1]]), bigRedZone)){
+      bigRedZoneGoals--;
+    }
+  }
   shots.pop();
   Plotly.redraw(document.getElementById('heatmap'));
   if(shots.length == 0){
@@ -194,6 +204,16 @@ function undo(){
 function redo(){
   if(oldShots.length <= 0){
     return;
+  }
+  if(oldShots[oldShots.length-1][0] == oldGoals[oldGoals.length-1][0] && oldShots[oldShots.length-1][1] == oldGoals[oldGoals.length-1][1]){
+    goals.push(oldShots[oldShots.length-1]);
+    if(turf.booleanPointInPolygon(turf.point([oldShots[oldShots.length-1][0], oldShots[oldShots.length-1][1]]), redZone)){
+      redZoneGoals++;
+      bigRedZoneGoals++;
+    }
+    else if(turf.booleanPointInPolygon(turf.point([oldShots[oldShots.length-1][0], oldShots[oldShots.length-1][1]]), bigRedZone)){
+      bigRedZoneGoals++;
+    }
   }
   shots.push(oldShots[oldShots.length-1]);
   addToHeatmap(oldShots[oldShots.length-1][0], oldShots[oldShots.length-1][1], 1);
