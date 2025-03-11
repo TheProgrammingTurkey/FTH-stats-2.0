@@ -5,14 +5,18 @@ canvas.height = canvas.clientHeight;
 
 let shots = [[]];
 let recentShot;
-let redZoneShots = 0;
-let bigRedZoneShots = 0;
+let redZoneLeftShots = 0;
+let bigRedZoneLeftShots = 0;
+let redZoneRightShots = 0;
+let bigRedZoneRightShots = 0;
 let oldShots = [[]];
 shots.pop();
 oldShots.pop();
 let goals = [[]];
-let redZoneGoals = 0;
-let bigRedZoneGoals = 0;
+let redZoneLeftGoals = 0;
+let bigRedZoneLeftGoals = 0;
+let redZoneRightGoals = 0;
+let bigRedZoneRightGoals = 0;
 let oldGoals = [[]];
 goals.pop();
 oldGoals.pop();
@@ -29,7 +33,7 @@ let mapWidth = 1000;
 let xVals = Math.ceil(mapWidth/5);
 let yVals = Math.ceil(mapHeight/5);
 
-let redZone = turf.polygon([[
+let redZoneLeft = turf.polygon([[
   [leftMargin+80, topMargin+234],
   [leftMargin+125, topMargin+218],
   [leftMargin+190, topMargin+218],
@@ -39,7 +43,7 @@ let redZone = turf.polygon([[
   [leftMargin+80, topMargin+234],
 ]]);
 
-let bigRedZone = turf.polygon([[
+let bigRedZoneLeft = turf.polygon([[
   [leftMargin+80, topMargin+234],
   [leftMargin+190, topMargin+157],
   [leftMargin+263, topMargin+157],
@@ -47,6 +51,26 @@ let bigRedZone = turf.polygon([[
   [leftMargin+190, topMargin+360],
   [leftMargin+80, topMargin+281],
   [leftMargin+80, topMargin+234],
+]]);
+
+let redZoneRight = turf.polygon([[
+  [leftMargin+canvas.width-80, topMargin+234],
+  [leftMargin+canvas.width-125, topMargin+218],
+  [leftMargin+canvas.width-190, topMargin+218],
+  [leftMargin+canvas.width-190, topMargin+298],
+  [leftMargin+canvas.width-125, topMargin+298],
+  [leftMargin+canvas.width-80, topMargin+281],
+  [leftMargin+canvas.width-80, topMargin+234],
+]]);
+
+let bigRedZoneRight = turf.polygon([[
+  [leftMargin+canvas.width-80, topMargin+234],
+  [leftMargin+canvas.width-190, topMargin+157],
+  [leftMargin+canvas.width-261, topMargin+157],
+  [leftMargin+canvas.width-261, topMargin+360],
+  [leftMargin+canvas.width-190, topMargin+360],
+  [leftMargin+canvas.width-80, topMargin+281],
+  [leftMargin+canvas.width-80, topMargin+234],
 ]]);
 
 let zShotValues = Array(yVals).fill().map(() => Array(xVals).fill(0));
@@ -93,41 +117,69 @@ function draw() {
   ctx.fillStyle = "white";
   ctx.lineWidth = 1; 
   ctx.beginPath();
-  ctx.moveTo(bigRedZone.geometry.coordinates[0][0][0]-leftMargin, bigRedZone.geometry.coordinates[0][0][1]-topMargin);
-  ctx.lineTo(bigRedZone.geometry.coordinates[0][1][0]-leftMargin, bigRedZone.geometry.coordinates[0][1][1]-topMargin);
-  ctx.lineTo(bigRedZone.geometry.coordinates[0][2][0]-leftMargin, bigRedZone.geometry.coordinates[0][2][1]-topMargin);
-  ctx.lineTo(bigRedZone.geometry.coordinates[0][3][0]-leftMargin, bigRedZone.geometry.coordinates[0][3][1]-topMargin);
-  ctx.lineTo(bigRedZone.geometry.coordinates[0][4][0]-leftMargin, bigRedZone.geometry.coordinates[0][4][1]-topMargin);
-  ctx.lineTo(bigRedZone.geometry.coordinates[0][5][0]-leftMargin, bigRedZone.geometry.coordinates[0][5][1]-topMargin);
-  ctx.lineTo(bigRedZone.geometry.coordinates[0][6][0]-leftMargin, bigRedZone.geometry.coordinates[0][6][1]-topMargin);
-  ctx.lineTo(bigRedZone.geometry.coordinates[0][0][0]-leftMargin, bigRedZone.geometry.coordinates[0][0][1]-topMargin);
+  ctx.moveTo(bigRedZoneLeft.geometry.coordinates[0][0][0]-leftMargin, bigRedZoneLeft.geometry.coordinates[0][0][1]-topMargin);
+  ctx.lineTo(bigRedZoneLeft.geometry.coordinates[0][1][0]-leftMargin, bigRedZoneLeft.geometry.coordinates[0][1][1]-topMargin);
+  ctx.lineTo(bigRedZoneLeft.geometry.coordinates[0][2][0]-leftMargin, bigRedZoneLeft.geometry.coordinates[0][2][1]-topMargin);
+  ctx.lineTo(bigRedZoneLeft.geometry.coordinates[0][3][0]-leftMargin, bigRedZoneLeft.geometry.coordinates[0][3][1]-topMargin);
+  ctx.lineTo(bigRedZoneLeft.geometry.coordinates[0][4][0]-leftMargin, bigRedZoneLeft.geometry.coordinates[0][4][1]-topMargin);
+  ctx.lineTo(bigRedZoneLeft.geometry.coordinates[0][5][0]-leftMargin, bigRedZoneLeft.geometry.coordinates[0][5][1]-topMargin);
+  ctx.lineTo(bigRedZoneLeft.geometry.coordinates[0][6][0]-leftMargin, bigRedZoneLeft.geometry.coordinates[0][6][1]-topMargin);
+  ctx.lineTo(bigRedZoneLeft.geometry.coordinates[0][0][0]-leftMargin, bigRedZoneLeft.geometry.coordinates[0][0][1]-topMargin);
   ctx.stroke();
   ctx.fill();
   ctx.beginPath();
-  ctx.moveTo(redZone.geometry.coordinates[0][0][0]-leftMargin, redZone.geometry.coordinates[0][0][1]-topMargin);
-  ctx.lineTo(redZone.geometry.coordinates[0][1][0]-leftMargin, redZone.geometry.coordinates[0][1][1]-topMargin);
-  ctx.lineTo(redZone.geometry.coordinates[0][2][0]-leftMargin, redZone.geometry.coordinates[0][2][1]-topMargin);
-  ctx.lineTo(redZone.geometry.coordinates[0][3][0]-leftMargin, redZone.geometry.coordinates[0][3][1]-topMargin);
-  ctx.lineTo(redZone.geometry.coordinates[0][4][0]-leftMargin, redZone.geometry.coordinates[0][4][1]-topMargin);
-  ctx.lineTo(redZone.geometry.coordinates[0][5][0]-leftMargin, redZone.geometry.coordinates[0][5][1]-topMargin);
-  ctx.lineTo(redZone.geometry.coordinates[0][6][0]-leftMargin, redZone.geometry.coordinates[0][6][1]-topMargin);
-  ctx.lineTo(redZone.geometry.coordinates[0][0][0]-leftMargin, redZone.geometry.coordinates[0][0][1]-topMargin);
+  ctx.moveTo(redZoneLeft.geometry.coordinates[0][0][0]-leftMargin, redZoneLeft.geometry.coordinates[0][0][1]-topMargin);
+  ctx.lineTo(redZoneLeft.geometry.coordinates[0][1][0]-leftMargin, redZoneLeft.geometry.coordinates[0][1][1]-topMargin);
+  ctx.lineTo(redZoneLeft.geometry.coordinates[0][2][0]-leftMargin, redZoneLeft.geometry.coordinates[0][2][1]-topMargin);
+  ctx.lineTo(redZoneLeft.geometry.coordinates[0][3][0]-leftMargin, redZoneLeft.geometry.coordinates[0][3][1]-topMargin);
+  ctx.lineTo(redZoneLeft.geometry.coordinates[0][4][0]-leftMargin, redZoneLeft.geometry.coordinates[0][4][1]-topMargin);
+  ctx.lineTo(redZoneLeft.geometry.coordinates[0][5][0]-leftMargin, redZoneLeft.geometry.coordinates[0][5][1]-topMargin);
+  ctx.lineTo(redZoneLeft.geometry.coordinates[0][6][0]-leftMargin, redZoneLeft.geometry.coordinates[0][6][1]-topMargin);
+  ctx.lineTo(redZoneLeft.geometry.coordinates[0][0][0]-leftMargin, redZoneLeft.geometry.coordinates[0][0][1]-topMargin);
+  ctx.stroke();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(bigRedZoneRight.geometry.coordinates[0][0][0]-leftMargin, bigRedZoneRight.geometry.coordinates[0][0][1]-topMargin);
+  ctx.lineTo(bigRedZoneRight.geometry.coordinates[0][1][0]-leftMargin, bigRedZoneRight.geometry.coordinates[0][1][1]-topMargin);
+  ctx.lineTo(bigRedZoneRight.geometry.coordinates[0][2][0]-leftMargin, bigRedZoneRight.geometry.coordinates[0][2][1]-topMargin);
+  ctx.lineTo(bigRedZoneRight.geometry.coordinates[0][3][0]-leftMargin, bigRedZoneRight.geometry.coordinates[0][3][1]-topMargin);
+  ctx.lineTo(bigRedZoneRight.geometry.coordinates[0][4][0]-leftMargin, bigRedZoneRight.geometry.coordinates[0][4][1]-topMargin);
+  ctx.lineTo(bigRedZoneRight.geometry.coordinates[0][5][0]-leftMargin, bigRedZoneRight.geometry.coordinates[0][5][1]-topMargin);
+  ctx.lineTo(bigRedZoneRight.geometry.coordinates[0][6][0]-leftMargin, bigRedZoneRight.geometry.coordinates[0][6][1]-topMargin);
+  ctx.lineTo(bigRedZoneRight.geometry.coordinates[0][0][0]-leftMargin, bigRedZoneRight.geometry.coordinates[0][0][1]-topMargin);
+  ctx.stroke();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(redZoneRight.geometry.coordinates[0][0][0]-leftMargin, redZoneRight.geometry.coordinates[0][0][1]-topMargin);
+  ctx.lineTo(redZoneRight.geometry.coordinates[0][1][0]-leftMargin, redZoneRight.geometry.coordinates[0][1][1]-topMargin);
+  ctx.lineTo(redZoneRight.geometry.coordinates[0][2][0]-leftMargin, redZoneRight.geometry.coordinates[0][2][1]-topMargin);
+  ctx.lineTo(redZoneRight.geometry.coordinates[0][3][0]-leftMargin, redZoneRight.geometry.coordinates[0][3][1]-topMargin);
+  ctx.lineTo(redZoneRight.geometry.coordinates[0][4][0]-leftMargin, redZoneRight.geometry.coordinates[0][4][1]-topMargin);
+  ctx.lineTo(redZoneRight.geometry.coordinates[0][5][0]-leftMargin, redZoneRight.geometry.coordinates[0][5][1]-topMargin);
+  ctx.lineTo(redZoneRight.geometry.coordinates[0][6][0]-leftMargin, redZoneRight.geometry.coordinates[0][6][1]-topMargin);
+  ctx.lineTo(redZoneRight.geometry.coordinates[0][0][0]-leftMargin, redZoneRight.geometry.coordinates[0][0][1]-topMargin);
   ctx.stroke();
   ctx.fill();
   ctx.fillStyle = "black";
   ctx.font = "bold 12px Arial";
   ctx.textAlign = "center";
   if(shots.length == 0){
-    ctx.fillText("No Shots have", (redZone.geometry.coordinates[0][0][0]-leftMargin+redZone.geometry.coordinates[0][3][0]-leftMargin)/2,(redZone.geometry.coordinates[0][3][1]-topMargin+redZone.geometry.coordinates[0][2][1]-topMargin)/2-8);
-    ctx.fillText("been taken", (redZone.geometry.coordinates[0][0][0]-leftMargin+redZone.geometry.coordinates[0][3][0]-leftMargin)/2,(redZone.geometry.coordinates[0][3][1]-topMargin+redZone.geometry.coordinates[0][2][1]-topMargin)/2+8);
+    ctx.fillText("No Shots have", (redZoneLeft.geometry.coordinates[0][0][0]-leftMargin+redZoneLeft.geometry.coordinates[0][3][0]-leftMargin)/2,(redZoneLeft.geometry.coordinates[0][3][1]-topMargin+redZoneLeft.geometry.coordinates[0][2][1]-topMargin)/2-8);
+    ctx.fillText("been taken", (redZoneLeft.geometry.coordinates[0][0][0]-leftMargin+redZoneLeft.geometry.coordinates[0][3][0]-leftMargin)/2,(redZoneLeft.geometry.coordinates[0][3][1]-topMargin+redZoneLeft.geometry.coordinates[0][2][1]-topMargin)/2+8);
+    ctx.fillText("No Shots have", (redZoneRight.geometry.coordinates[0][0][0]-leftMargin+redZoneRight.geometry.coordinates[0][3][0]-leftMargin)/2,(redZoneRight.geometry.coordinates[0][3][1]-topMargin+redZoneRight.geometry.coordinates[0][2][1]-topMargin)/2-8);
+    ctx.fillText("been taken", (redZoneRight.geometry.coordinates[0][0][0]-leftMargin+redZoneRight.geometry.coordinates[0][3][0]-leftMargin)/2,(redZoneRight.geometry.coordinates[0][3][1]-topMargin+redZoneRight.geometry.coordinates[0][2][1]-topMargin)/2+8);
   }
   else{
-    ctx.fillText(Math.round(redZoneShots*10000/shots.length)/100 + "% of shots", (redZone.geometry.coordinates[0][0][0]-leftMargin+redZone.geometry.coordinates[0][3][0]-leftMargin)/2,(redZone.geometry.coordinates[0][3][1]-topMargin+redZone.geometry.coordinates[0][2][1]-topMargin)/2-10);
-    ctx.fillText(Math.round(bigRedZoneShots*10000/shots.length)/100 + "% of shots", (bigRedZone.geometry.coordinates[0][0][0]-leftMargin+bigRedZone.geometry.coordinates[0][3][0]-leftMargin)/2+30,(bigRedZone.geometry.coordinates[0][3][1]-topMargin+bigRedZone.geometry.coordinates[0][2][1]-topMargin)/2-60);
+    ctx.fillText(Math.round(redZoneLeftShots*10000/shots.length)/100 + "% of shots", (redZoneLeft.geometry.coordinates[0][0][0]-leftMargin+redZoneLeft.geometry.coordinates[0][3][0]-leftMargin)/2,(redZoneLeft.geometry.coordinates[0][3][1]-topMargin+redZoneLeft.geometry.coordinates[0][2][1]-topMargin)/2-10);
+    ctx.fillText(Math.round(bigRedZoneLeftShots*10000/shots.length)/100 + "% of shots", (bigRedZoneLeft.geometry.coordinates[0][0][0]-leftMargin+bigRedZoneLeft.geometry.coordinates[0][3][0]-leftMargin)/2+30,(bigRedZoneLeft.geometry.coordinates[0][3][1]-topMargin+bigRedZoneLeft.geometry.coordinates[0][2][1]-topMargin)/2-60);
+    ctx.fillText(Math.round(redZoneRightShots*10000/shots.length)/100 + "% of shots", (redZoneRight.geometry.coordinates[0][0][0]-leftMargin+redZoneRight.geometry.coordinates[0][3][0]-leftMargin)/2,(redZoneRight.geometry.coordinates[0][3][1]-topMargin+redZoneRight.geometry.coordinates[0][2][1]-topMargin)/2-10);
+    ctx.fillText(Math.round(bigRedZoneRightShots*10000/shots.length)/100 + "% of shots", (bigRedZoneRight.geometry.coordinates[0][0][0]-leftMargin+bigRedZoneRight.geometry.coordinates[0][3][0]-leftMargin)/2-30,(bigRedZoneRight.geometry.coordinates[0][3][1]-topMargin+bigRedZoneRight.geometry.coordinates[0][2][1]-topMargin)/2-60);
   }
   if(goals.length != 0){
-    ctx.fillText(Math.round(redZoneGoals*10000/goals.length)/100 + "% of goals", (redZone.geometry.coordinates[0][0][0]-leftMargin+redZone.geometry.coordinates[0][3][0]-leftMargin)/2,(redZone.geometry.coordinates[0][3][1]-topMargin+redZone.geometry.coordinates[0][2][1]-topMargin)/2+10);
-    ctx.fillText(Math.round(bigRedZoneGoals*10000/goals.length)/100 + "% of goals", (bigRedZone.geometry.coordinates[0][0][0]-leftMargin+bigRedZone.geometry.coordinates[0][3][0]-leftMargin)/2+30,(bigRedZone.geometry.coordinates[0][3][1]-topMargin+bigRedZone.geometry.coordinates[0][2][1]-topMargin)/2+60);
+    ctx.fillText(Math.round(redZoneLeftGoals*10000/goals.length)/100 + "% of goals", (redZoneLeft.geometry.coordinates[0][0][0]-leftMargin+redZoneLeft.geometry.coordinates[0][3][0]-leftMargin)/2,(redZoneLeft.geometry.coordinates[0][3][1]-topMargin+redZoneLeft.geometry.coordinates[0][2][1]-topMargin)/2+10);
+    ctx.fillText(Math.round(bigRedZoneLeftGoals*10000/goals.length)/100 + "% of goals", (bigRedZoneLeft.geometry.coordinates[0][0][0]-leftMargin+bigRedZoneLeft.geometry.coordinates[0][3][0]-leftMargin)/2+30,(bigRedZoneLeft.geometry.coordinates[0][3][1]-topMargin+bigRedZoneLeft.geometry.coordinates[0][2][1]-topMargin)/2+60);
+    ctx.fillText(Math.round(redZoneRightGoals*10000/goals.length)/100 + "% of goals", (redZoneRight.geometry.coordinates[0][0][0]-leftMargin+redZoneRight.geometry.coordinates[0][3][0]-leftMargin)/2,(redZoneRight.geometry.coordinates[0][3][1]-topMargin+redZoneRight.geometry.coordinates[0][2][1]-topMargin)/2+10);
+    ctx.fillText(Math.round(bigRedZoneRightGoals*10000/goals.length)/100 + "% of goals", (bigRedZoneRight.geometry.coordinates[0][0][0]-leftMargin+bigRedZoneRight.geometry.coordinates[0][3][0]-leftMargin)/2-30,(bigRedZoneRight.geometry.coordinates[0][3][1]-topMargin+bigRedZoneRight.geometry.coordinates[0][2][1]-topMargin)/2+60);
   }
   window.requestAnimationFrame(draw);
 }
@@ -150,12 +202,19 @@ function addGoal(){
   goals.push(recentShot);
   addToHeatmap(recentShot[0], recentShot[1], 1, "goal");
   let pt = turf.point(recentShot);
-  if(turf.booleanPointInPolygon(pt, redZone)){
-    redZoneGoals++;
-    bigRedZoneGoals++;
+  if(turf.booleanPointInPolygon(pt, redZoneLeft)){
+    redZoneLeftGoals++;
+    bigRedZoneLeftGoals++;
   }
-  else if(turf.booleanPointInPolygon(pt, bigRedZone)){
-    bigRedZoneGoals++;
+  else if(turf.booleanPointInPolygon(pt, bigRedZoneLeft)){
+    bigRedZoneLeftGoals++;
+  }
+  if(turf.booleanPointInPolygon(pt, redZoneRight)){
+    redZoneRightGoals++;
+    bigRedZoneRightGoals++;
+  }
+  else if(turf.booleanPointInPolygon(pt, bigRedZoneRight)){
+    bigRedZoneRightGoals++;
   }
   addShot();
 }
@@ -187,12 +246,19 @@ function undo(){
   oldShots.push([shots[shots.length-1][0], shots[shots.length-1][1]]);
   if(goals.length > 0 && shots[shots.length-1][0] == goals[goals.length-1][0] && shots[shots.length-1][1] == goals[goals.length-1][1]){
     goals.pop();
-    if(turf.booleanPointInPolygon(turf.point([shots[shots.length-1][0], shots[shots.length-1][1]]), redZone)){
-      redZoneGoals--;
-      bigRedZoneGoals--;
+    if(turf.booleanPointInPolygon(turf.point([shots[shots.length-1][0], shots[shots.length-1][1]]), redZoneLeft)){
+      redZoneLeftGoals--;
+      bigRedZoneLeftGoals--;
     }
-    else if(turf.booleanPointInPolygon(turf.point([shots[shots.length-1][0], shots[shots.length-1][1]]), bigRedZone)){
-      bigRedZoneGoals--;
+    else if(turf.booleanPointInPolygon(turf.point([shots[shots.length-1][0], shots[shots.length-1][1]]), bigRedZoneLeft)){
+      bigRedZoneLeftGoals--;
+    }
+    if(turf.booleanPointInPolygon(turf.point([shots[shots.length-1][0], shots[shots.length-1][1]]), redZoneRight)){
+      redZoneRightGoals--;
+      bigRedZoneRightGoals--;
+    }
+    else if(turf.booleanPointInPolygon(turf.point([shots[shots.length-1][0], shots[shots.length-1][1]]), bigRedZoneRight)){
+      bigRedZoneRightGoals--;
     }
   }
   shots.pop();
@@ -212,12 +278,19 @@ function redo(){
   if(oldGoals.length > 0 && oldShots[oldShots.length-1][0] == oldGoals[oldGoals.length-1][0] && oldShots[oldShots.length-1][1] == oldGoals[oldGoals.length-1][1]){
     goals.push(oldShots[oldShots.length-1]);
     addToHeatmap(oldShots[oldShots.length-1][0], oldShots[oldShots.length-1][1], 1, "goal");
-    if(turf.booleanPointInPolygon(turf.point([oldShots[oldShots.length-1][0], oldShots[oldShots.length-1][1]]), redZone)){
-      redZoneGoals++;
-      bigRedZoneGoals++;
+    if(turf.booleanPointInPolygon(turf.point([oldShots[oldShots.length-1][0], oldShots[oldShots.length-1][1]]), redZoneLeft)){
+      redZoneLeftGoals++;
+      bigRedZoneLeftGoals++;
     }
-    else if(turf.booleanPointInPolygon(turf.point([oldShots[oldShots.length-1][0], oldShots[oldShots.length-1][1]]), bigRedZone)){
-      bigRedZoneGoals++;
+    else if(turf.booleanPointInPolygon(turf.point([oldShots[oldShots.length-1][0], oldShots[oldShots.length-1][1]]), bigRedZoneLeft)){
+      bigRedZoneLeftGoals++;
+    }
+    if(turf.booleanPointInPolygon(turf.point([oldShots[oldShots.length-1][0], oldShots[oldShots.length-1][1]]), redZoneRight)){
+      redZoneRightGoals++;
+      bigRedZoneRightGoals++;
+    }
+    else if(turf.booleanPointInPolygon(turf.point([oldShots[oldShots.length-1][0], oldShots[oldShots.length-1][1]]), bigRedZoneRight)){
+      bigRedZoneRightGoals++;
     }
   }
   shots.push(oldShots[oldShots.length-1]);
@@ -260,21 +333,39 @@ function changeType(){
 function addToHeatmap(x, y, coefficient, type){
   let pt = turf.point([x, y]);
   if(coefficient == 1){
-    if(turf.booleanPointInPolygon(pt, redZone)){
-      redZoneShots++;
-      bigRedZoneShots++;
+    if(turf.booleanPointInPolygon(pt, redZoneLeft)){
+      redZoneLeftShots++;
+      bigRedZoneLeftShots++;
     }
-    else if(turf.booleanPointInPolygon(pt, bigRedZone)){
-      bigRedZoneShots++;
+    else if(turf.booleanPointInPolygon(pt, bigRedZoneLeft)){
+      bigRedZoneLeftShots++;
     }
   }
   else{
-    if(turf.booleanPointInPolygon(pt, redZone)){
-      redZoneShots--;
-      bigRedZoneShots--;
+    if(turf.booleanPointInPolygon(pt, redZoneLeft)){
+      redZoneLeftShots--;
+      bigRedZoneLeftShots--;
     }
-    else if(turf.booleanPointInPolygon(pt, bigRedZone)){
-      bigRedZoneShots--;
+    else if(turf.booleanPointInPolygon(pt, bigRedZoneLeft)){
+      bigRedZoneLeftShots--;
+    }
+  }
+  if(coefficient == 1){
+    if(turf.booleanPointInPolygon(pt, redZoneRight)){
+      redZoneRightShots++;
+      bigRedZoneRightShots++;
+    }
+    else if(turf.booleanPointInPolygon(pt, bigRedZoneRight)){
+      bigRedZoneRightShots++;
+    }
+  }
+  else{
+    if(turf.booleanPointInPolygon(pt, redZoneRight)){
+      redZoneRightShots--;
+      bigRedZoneRightShots--;
+    }
+    else if(turf.booleanPointInPolygon(pt, bigRedZoneRight)){
+      bigRedZoneRightShots--;
     }
   }
   let xPos = Math.floor((x-leftMargin)/5);
