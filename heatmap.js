@@ -19,7 +19,8 @@ oldGoals.pop();
 
 let heatmap = document.getElementById('heatmap');
 let rink = document.getElementById('rink');
-let popup = document.getElementById('popup')
+let popup = document.getElementById('popup');
+let heatmapType = document.getElementById('type');
 popup.style.display = "none";
 let topMargin = heatmap.getBoundingClientRect().top;
 let leftMargin = rink.getBoundingClientRect().left;
@@ -49,6 +50,7 @@ let bigRedZone = turf.polygon([[
 ]]);
 
 let zShotValues = Array(yVals).fill().map(() => Array(xVals).fill(0));
+let zGoalValues = Array(yVals).fill().map(() => Array(xVals).fill(0));
 
 let colorscaleValue = [
   [0, '#FF']
@@ -146,6 +148,7 @@ document.addEventListener("click", function(e) {
 
 function addGoal(){
   goals.push(recentShot);
+  addToHeatmap(recentShot[0], recentShot[1], 1, "goal");
   let pt = turf.point(recentShot);
   if(turf.booleanPointInPolygon(pt, redZone)){
     redZoneGoals++;
@@ -158,7 +161,7 @@ function addGoal(){
 }
 function addShot(){
   shots.push(recentShot);
-  addToHeatmap(recentShot[0], recentShot[1], 1);
+  addToHeatmap(recentShot[0], recentShot[1], 1, "shot");
   if(shots.length == 1){
     newColorscale = [
       [0, 'Green'],
@@ -176,9 +179,10 @@ function undo(){
   if(shots.length <= 0){
     return;
   }
-  addToHeatmap(shots[shots.length-1][0], shots[shots.length-1][1], -1);
+  addToHeatmap(shots[shots.length-1][0], shots[shots.length-1][1], -1, "shot");
   if(goals.length > 0 && shots[shots.length-1][0] == goals[goals.length-1][0] && shots[shots.length-1][1] == goals[goals.length-1][1]){
     oldGoals.push([goals[goals.length-1][0], goals[goals.length-1][1]]);
+    addToHeatmap(shots[shots.length-1][0], shots[shots.length-1][1], -1, "goal");
   }
   oldShots.push([shots[shots.length-1][0], shots[shots.length-1][1]]);
   if(goals.length > 0 && shots[shots.length-1][0] == goals[goals.length-1][0] && shots[shots.length-1][1] == goals[goals.length-1][1]){
@@ -205,8 +209,9 @@ function redo(){
   if(oldShots.length <= 0){
     return;
   }
-  if(oldShots[oldShots.length-1][0] == oldGoals[oldGoals.length-1][0] && oldShots[oldShots.length-1][1] == oldGoals[oldGoals.length-1][1]){
+  if(oldGoals.length > 0 && oldShots[oldShots.length-1][0] == oldGoals[oldGoals.length-1][0] && oldShots[oldShots.length-1][1] == oldGoals[oldGoals.length-1][1]){
     goals.push(oldShots[oldShots.length-1]);
+    addToHeatmap(oldShots[oldShots.length-1][0], oldShots[oldShots.length-1][1], 1, "goal");
     if(turf.booleanPointInPolygon(turf.point([oldShots[oldShots.length-1][0], oldShots[oldShots.length-1][1]]), redZone)){
       redZoneGoals++;
       bigRedZoneGoals++;
@@ -216,7 +221,7 @@ function redo(){
     }
   }
   shots.push(oldShots[oldShots.length-1]);
-  addToHeatmap(oldShots[oldShots.length-1][0], oldShots[oldShots.length-1][1], 1);
+  addToHeatmap(oldShots[oldShots.length-1][0], oldShots[oldShots.length-1][1], 1, "shot");
   Plotly.redraw(document.getElementById('heatmap'));
   if(shots.length == 1){
     newColorscale = [
@@ -237,6 +242,18 @@ function showStats(){
   else{
     canvas.style.opacity = 0;
   }
+}
+
+function changeType(){
+  if(type.innerHTML == "Show Goal Heatmap"){
+    type.innerHTML = "Show Shot Heatmap";
+    data[0].z = zGoalValues;
+  }
+  else{
+    type.innerHTML = "Show Goal Heatmap";
+    data[0].z = zShotValues;
+  }
+  Plotly.react('heatmap', data, layout, {staticPlot: true});
 }
 
 
@@ -262,94 +279,187 @@ function addToHeatmap(x, y, coefficient, type){
   }
   let xPos = Math.floor((x-leftMargin)/5);
   let yPos = zShotValues.length - Math.floor((y-topMargin)/(mapHeight/yVals))-1;
-  zShotValues[yPos][xPos]+=20*coefficient;
-  zShotValues[yPos][xPos+1]+=20*coefficient;
-  zShotValues[yPos][xPos-1]+=20*coefficient;
-  zShotValues[yPos][xPos+2]+=10*coefficient;
-  zShotValues[yPos][xPos-2]+=10*coefficient;
-  zShotValues[yPos][xPos+3]+=5*coefficient;
-  zShotValues[yPos][xPos-3]+=5*coefficient;
-  zShotValues[yPos][xPos+4]+=coefficient;
-  zShotValues[yPos][xPos-4]+=coefficient;
-  if(zShotValues.length > yPos+1){
-    zShotValues[yPos+1][xPos]+=20*coefficient;
-    zShotValues[yPos+1][xPos+1]+=10*coefficient;
-    zShotValues[yPos+1][xPos-1]+=10*coefficient;
-    zShotValues[yPos+1][xPos+2]+=5*coefficient;
-    zShotValues[yPos+1][xPos-2]+=5*coefficient;
-    zShotValues[yPos+1][xPos+3]+=5*coefficient;
-    zShotValues[yPos+1][xPos-3]+=5*coefficient;
-    zShotValues[yPos+1][xPos+4]+=coefficient;
-    zShotValues[yPos+1][xPos-4]+=coefficient;
+  if(type == "shot"){
+    zShotValues[yPos][xPos]+=20*coefficient;
+    zShotValues[yPos][xPos+1]+=20*coefficient;
+    zShotValues[yPos][xPos-1]+=20*coefficient;
+    zShotValues[yPos][xPos+2]+=10*coefficient;
+    zShotValues[yPos][xPos-2]+=10*coefficient;
+    zShotValues[yPos][xPos+3]+=5*coefficient;
+    zShotValues[yPos][xPos-3]+=5*coefficient;
+    zShotValues[yPos][xPos+4]+=coefficient;
+    zShotValues[yPos][xPos-4]+=coefficient;
+    if(zShotValues.length > yPos+1){
+      zShotValues[yPos+1][xPos]+=20*coefficient;
+      zShotValues[yPos+1][xPos+1]+=10*coefficient;
+      zShotValues[yPos+1][xPos-1]+=10*coefficient;
+      zShotValues[yPos+1][xPos+2]+=5*coefficient;
+      zShotValues[yPos+1][xPos-2]+=5*coefficient;
+      zShotValues[yPos+1][xPos+3]+=5*coefficient;
+      zShotValues[yPos+1][xPos-3]+=5*coefficient;
+      zShotValues[yPos+1][xPos+4]+=coefficient;
+      zShotValues[yPos+1][xPos-4]+=coefficient;
+    }
+    if(yPos > 0){
+      zShotValues[yPos-1][xPos]+=20*coefficient;
+      zShotValues[yPos-1][xPos+1]+=10*coefficient;
+      zShotValues[yPos-1][xPos-1]+=10*coefficient;
+      zShotValues[yPos-1][xPos+2]+=5*coefficient;
+      zShotValues[yPos-1][xPos-2]+=5*coefficient;
+      zShotValues[yPos-1][xPos+3]+=5*coefficient;
+      zShotValues[yPos-1][xPos-3]+=5*coefficient;
+      zShotValues[yPos-1][xPos+4]+=coefficient;
+      zShotValues[yPos-1][xPos-4]+=coefficient;
+    }
+    if(zShotValues.length > yPos+2){
+      zShotValues[yPos+2][xPos]+=10*coefficient;
+      zShotValues[yPos+2][xPos+1]+=5*coefficient;
+      zShotValues[yPos+2][xPos-1]+=5*coefficient;
+      zShotValues[yPos+2][xPos+2]+=5*coefficient;
+      zShotValues[yPos+2][xPos-2]+=5*coefficient;
+      zShotValues[yPos+2][xPos+3]+=coefficient;
+      zShotValues[yPos+2][xPos-3]+=coefficient;
+      zShotValues[yPos+2][xPos+4]+=coefficient;
+      zShotValues[yPos+2][xPos-4]+=coefficient;
+    }
+    if(yPos > 1){
+      zShotValues[yPos-2][xPos]+=10*coefficient;
+      zShotValues[yPos-2][xPos+1]+=5*coefficient;
+      zShotValues[yPos-2][xPos-1]+=5*coefficient;
+      zShotValues[yPos-2][xPos+2]+=5*coefficient;
+      zShotValues[yPos-2][xPos-2]+=5*coefficient;
+      zShotValues[yPos-2][xPos+3]+=coefficient;
+      zShotValues[yPos-2][xPos-3]+=coefficient;
+      zShotValues[yPos-2][xPos+4]+=coefficient;
+      zShotValues[yPos-2][xPos-4]+=coefficient;
+    }
+    if(zShotValues.length > yPos+3){
+      zShotValues[yPos+3][xPos]+=5*coefficient;
+      zShotValues[yPos+3][xPos+1]+=5*coefficient;
+      zShotValues[yPos+3][xPos-1]+=5*coefficient;
+      zShotValues[yPos+3][xPos+3]+=coefficient;
+      zShotValues[yPos+3][xPos-3]+=coefficient;
+      zShotValues[yPos+3][xPos+2]+=coefficient;
+      zShotValues[yPos+3][xPos-2]+=coefficient;
+    }
+    if(yPos > 2){
+      zShotValues[yPos-3][xPos]+=5*coefficient;
+      zShotValues[yPos-3][xPos+1]+=5*coefficient;
+      zShotValues[yPos-3][xPos-1]+=5*coefficient;
+      zShotValues[yPos-3][xPos+3]+=coefficient;
+      zShotValues[yPos-3][xPos-3]+=coefficient;
+      zShotValues[yPos-3][xPos+2]+=coefficient;
+      zShotValues[yPos-3][xPos-2]+=coefficient;
+    }
+    if(zShotValues.length > yPos+4){
+      zShotValues[yPos+4][xPos]+=coefficient;
+      zShotValues[yPos+4][xPos-1]+=coefficient;
+      zShotValues[yPos+4][xPos-2]+=coefficient;
+      zShotValues[yPos+4][xPos+1]+=coefficient;
+      zShotValues[yPos+4][xPos+2]+=coefficient;
+    }
+    if(yPos > 3){
+      zShotValues[yPos-4][xPos]+=coefficient;
+      zShotValues[yPos-4][xPos-1]+=coefficient;
+      zShotValues[yPos-4][xPos-2]+=coefficient;
+      zShotValues[yPos-4][xPos+1]+=coefficient;
+      zShotValues[yPos-4][xPos+2]+=coefficient;
+    }
+    zShotValues = zShotValues.slice(0, xVals);
+    for(let i = 0; i < yVals; i++){
+      zShotValues[i].splice(xVals);
+    }
   }
-  if(yPos > 0){
-    zShotValues[yPos-1][xPos]+=20*coefficient;
-    zShotValues[yPos-1][xPos+1]+=10*coefficient;
-    zShotValues[yPos-1][xPos-1]+=10*coefficient;
-    zShotValues[yPos-1][xPos+2]+=5*coefficient;
-    zShotValues[yPos-1][xPos-2]+=5*coefficient;
-    zShotValues[yPos-1][xPos+3]+=5*coefficient;
-    zShotValues[yPos-1][xPos-3]+=5*coefficient;
-    zShotValues[yPos-1][xPos+4]+=coefficient;
-    zShotValues[yPos-1][xPos-4]+=coefficient;
-  }
-  if(zShotValues.length > yPos+2){
-    zShotValues[yPos+2][xPos]+=10*coefficient;
-    zShotValues[yPos+2][xPos+1]+=5*coefficient;
-    zShotValues[yPos+2][xPos-1]+=5*coefficient;
-    zShotValues[yPos+2][xPos+2]+=5*coefficient;
-    zShotValues[yPos+2][xPos-2]+=5*coefficient;
-    zShotValues[yPos+2][xPos+3]+=coefficient;
-    zShotValues[yPos+2][xPos-3]+=coefficient;
-    zShotValues[yPos+2][xPos+4]+=coefficient;
-    zShotValues[yPos+2][xPos-4]+=coefficient;
-  }
-  if(yPos > 1){
-    zShotValues[yPos-2][xPos]+=10*coefficient;
-    zShotValues[yPos-2][xPos+1]+=5*coefficient;
-    zShotValues[yPos-2][xPos-1]+=5*coefficient;
-    zShotValues[yPos-2][xPos+2]+=5*coefficient;
-    zShotValues[yPos-2][xPos-2]+=5*coefficient;
-    zShotValues[yPos-2][xPos+3]+=coefficient;
-    zShotValues[yPos-2][xPos-3]+=coefficient;
-    zShotValues[yPos-2][xPos+4]+=coefficient;
-    zShotValues[yPos-2][xPos-4]+=coefficient;
-  }
-  if(zShotValues.length > yPos+3){
-    zShotValues[yPos+3][xPos]+=5*coefficient;
-    zShotValues[yPos+3][xPos+1]+=5*coefficient;
-    zShotValues[yPos+3][xPos-1]+=5*coefficient;
-    zShotValues[yPos+3][xPos+3]+=coefficient;
-    zShotValues[yPos+3][xPos-3]+=coefficient;
-    zShotValues[yPos+3][xPos+2]+=coefficient;
-    zShotValues[yPos+3][xPos-2]+=coefficient;
-  }
-  if(yPos > 2){
-    zShotValues[yPos-3][xPos]+=5*coefficient;
-    zShotValues[yPos-3][xPos+1]+=5*coefficient;
-    zShotValues[yPos-3][xPos-1]+=5*coefficient;
-    zShotValues[yPos-3][xPos+3]+=coefficient;
-    zShotValues[yPos-3][xPos-3]+=coefficient;
-    zShotValues[yPos-3][xPos+2]+=coefficient;
-    zShotValues[yPos-3][xPos-2]+=coefficient;
-  }
-  if(zShotValues.length > yPos+4){
-    zShotValues[yPos+4][xPos]+=coefficient;
-    zShotValues[yPos+4][xPos-1]+=coefficient;
-    zShotValues[yPos+4][xPos-2]+=coefficient;
-    zShotValues[yPos+4][xPos+1]+=coefficient;
-    zShotValues[yPos+4][xPos+2]+=coefficient;
-  }
-  if(yPos > 3){
-    zShotValues[yPos-4][xPos]+=coefficient;
-    zShotValues[yPos-4][xPos-1]+=coefficient;
-    zShotValues[yPos-4][xPos-2]+=coefficient;
-    zShotValues[yPos-4][xPos+1]+=coefficient;
-    zShotValues[yPos-4][xPos+2]+=coefficient;
-  }
-  zShotValues = zShotValues.slice(0, xVals);
-  for(let i = 0; i < yVals; i++){
-    zShotValues[i].splice(xVals);
+  else{
+    zGoalValues[yPos][xPos]+=20*coefficient;
+    zGoalValues[yPos][xPos+1]+=20*coefficient;
+    zGoalValues[yPos][xPos-1]+=20*coefficient;
+    zGoalValues[yPos][xPos+2]+=10*coefficient;
+    zGoalValues[yPos][xPos-2]+=10*coefficient;
+    zGoalValues[yPos][xPos+3]+=5*coefficient;
+    zGoalValues[yPos][xPos-3]+=5*coefficient;
+    zGoalValues[yPos][xPos+4]+=coefficient;
+    zGoalValues[yPos][xPos-4]+=coefficient;
+    if(zGoalValues.length > yPos+1){
+      zGoalValues[yPos+1][xPos]+=20*coefficient;
+      zGoalValues[yPos+1][xPos+1]+=10*coefficient;
+      zGoalValues[yPos+1][xPos-1]+=10*coefficient;
+      zGoalValues[yPos+1][xPos+2]+=5*coefficient;
+      zGoalValues[yPos+1][xPos-2]+=5*coefficient;
+      zGoalValues[yPos+1][xPos+3]+=5*coefficient;
+      zGoalValues[yPos+1][xPos-3]+=5*coefficient;
+      zGoalValues[yPos+1][xPos+4]+=coefficient;
+      zGoalValues[yPos+1][xPos-4]+=coefficient;
+    }
+    if(yPos > 0){
+      zGoalValues[yPos-1][xPos]+=20*coefficient;
+      zGoalValues[yPos-1][xPos+1]+=10*coefficient;
+      zGoalValues[yPos-1][xPos-1]+=10*coefficient;
+      zGoalValues[yPos-1][xPos+2]+=5*coefficient;
+      zGoalValues[yPos-1][xPos-2]+=5*coefficient;
+      zGoalValues[yPos-1][xPos+3]+=5*coefficient;
+      zGoalValues[yPos-1][xPos-3]+=5*coefficient;
+      zGoalValues[yPos-1][xPos+4]+=coefficient;
+      zGoalValues[yPos-1][xPos-4]+=coefficient;
+    }
+    if(zGoalValues.length > yPos+2){
+      zGoalValues[yPos+2][xPos]+=10*coefficient;
+      zGoalValues[yPos+2][xPos+1]+=5*coefficient;
+      zGoalValues[yPos+2][xPos-1]+=5*coefficient;
+      zGoalValues[yPos+2][xPos+2]+=5*coefficient;
+      zGoalValues[yPos+2][xPos-2]+=5*coefficient;
+      zGoalValues[yPos+2][xPos+3]+=coefficient;
+      zGoalValues[yPos+2][xPos-3]+=coefficient;
+      zGoalValues[yPos+2][xPos+4]+=coefficient;
+      zGoalValues[yPos+2][xPos-4]+=coefficient;
+    }
+    if(yPos > 1){
+      zGoalValues[yPos-2][xPos]+=10*coefficient;
+      zGoalValues[yPos-2][xPos+1]+=5*coefficient;
+      zGoalValues[yPos-2][xPos-1]+=5*coefficient;
+      zGoalValues[yPos-2][xPos+2]+=5*coefficient;
+      zGoalValues[yPos-2][xPos-2]+=5*coefficient;
+      zGoalValues[yPos-2][xPos+3]+=coefficient;
+      zGoalValues[yPos-2][xPos-3]+=coefficient;
+      zGoalValues[yPos-2][xPos+4]+=coefficient;
+      zGoalValues[yPos-2][xPos-4]+=coefficient;
+    }
+    if(zGoalValues.length > yPos+3){
+      zGoalValues[yPos+3][xPos]+=5*coefficient;
+      zGoalValues[yPos+3][xPos+1]+=5*coefficient;
+      zGoalValues[yPos+3][xPos-1]+=5*coefficient;
+      zGoalValues[yPos+3][xPos+3]+=coefficient;
+      zGoalValues[yPos+3][xPos-3]+=coefficient;
+      zGoalValues[yPos+3][xPos+2]+=coefficient;
+      zGoalValues[yPos+3][xPos-2]+=coefficient;
+    }
+    if(yPos > 2){
+      zGoalValues[yPos-3][xPos]+=5*coefficient;
+      zGoalValues[yPos-3][xPos+1]+=5*coefficient;
+      zGoalValues[yPos-3][xPos-1]+=5*coefficient;
+      zGoalValues[yPos-3][xPos+3]+=coefficient;
+      zGoalValues[yPos-3][xPos-3]+=coefficient;
+      zGoalValues[yPos-3][xPos+2]+=coefficient;
+      zGoalValues[yPos-3][xPos-2]+=coefficient;
+    }
+    if(zGoalValues.length > yPos+4){
+      zGoalValues[yPos+4][xPos]+=coefficient;
+      zGoalValues[yPos+4][xPos-1]+=coefficient;
+      zGoalValues[yPos+4][xPos-2]+=coefficient;
+      zGoalValues[yPos+4][xPos+1]+=coefficient;
+      zGoalValues[yPos+4][xPos+2]+=coefficient;
+    }
+    if(yPos > 3){
+      zGoalValues[yPos-4][xPos]+=coefficient;
+      zGoalValues[yPos-4][xPos-1]+=coefficient;
+      zGoalValues[yPos-4][xPos-2]+=coefficient;
+      zGoalValues[yPos-4][xPos+1]+=coefficient;
+      zGoalValues[yPos-4][xPos+2]+=coefficient;
+    }
+    zGoalValues = zGoalValues.slice(0, xVals);
+    for(let i = 0; i < yVals; i++){
+      zGoalValues[i].splice(xVals);
+    }
   }
 }
 window.requestAnimationFrame(draw);
