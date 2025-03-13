@@ -4,13 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FTH Stats 2.0</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="heatmap.css">
 </head>
 <body>
-    <h1>FTH Stats 2.0</h1>
-    <div class="button-container">
-        <a href="heatmap.html" class="button">Heatmap</a>
-        <a href="goalie.html" class="button">Goalie Stats</a>
+    <div class="header">
+        <a>Home</a>
+        <div class="header-right">
+            <a onclick="changeType()" id="type">Show Goal Heatmap</a>
+            <a onclick="showStats()">Show Stats</a>
+            <a onclick="undo()">Undo</a>
+            <a onclick="redo()">Redo</a>
+        </div>
     </div>
+    <div id="popup">
+        <button id="shot-popup" onclick="addShot()">SHOT</button>
+        <button id="goal-popup" onclick="addGoal()">GOAL</button>
+    </div>
+    <img src="hockeyRink.png" id="rink">
+    <div id="heatmap"></div>
+    <canvas id="canvas"></canvas>
+    <script src='https://cdn.plot.ly/plotly-2.16.1.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
+    <script src="heatmap.js"></script>
 </body>
 </html>
