@@ -7,24 +7,28 @@
     <link rel="stylesheet" href="heatmap.css">
 </head>
 <body>
+    <!-- Where the user can undo/redo his/her actions, shows the stats, and change the heatmap -->
     <div class="header">
-        <!-- <a>Home</a> -->
-        <div class="header-right">
-            <a onclick="changeType()" id="type">Show Goal Heatmap</a>
-            <a onclick="showStats()">Show Stats</a>
-            <a onclick="undo()">Undo</a>
-            <a onclick="redo()">Redo</a>
-        </div>
+        <a onclick="changeType()" id="type">Show Goal Heatmap</a>
+        <a onclick="showStats()">Show Stats</a>
+        <a onclick="undo()">Undo</a>
+        <a onclick="redo()">Redo</a>
     </div>
+    <!-- Allows the user to select if a shot was a goal or not -->
     <div id="popup">
         <button id="shot-popup" onclick="addShot()">SHOT</button>
         <button id="goal-popup" onclick="addGoal()">GOAL</button>
     </div>
+    <!-- The rink image -->
     <img src="hockeyRink.png" id="rink">
+    <!-- The heatmap -->
     <div id="heatmap"></div>
+    <!-- The canvas where the stats will be drawn -->
     <canvas id="canvas"></canvas>
+    <!-- Imported Libraries -->
     <script src='https://cdn.plot.ly/plotly-2.16.1.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
+    <!-- JS file -->
     <script src="heatmap.js"></script>
 </body>
 </html>

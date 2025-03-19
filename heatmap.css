@@ -1,7 +1,9 @@
+/* Everything */
 *{
   margin: 0;
   padding: 0;
 }
+/* The heatmap */
 #heatmap{
   position: absolute;
   left: 50%;  
@@ -9,6 +11,7 @@
   opacity: .0;
   z-index: 2;
 }
+/* The stats for the heatmap */
 #canvas{
   width: 1000px;
   height: 500px;
@@ -18,6 +21,7 @@
   opacity: 0;
   z-index: 3;
 }
+/* The rink image */
 #rink{
   width: 1000px;
   height: 500px;
@@ -28,12 +32,13 @@
   clip-path: inset(11% 0 8% 0);
   z-index: 1;
 }
+/* The header */
 .header {
   overflow: hidden;
   background-color: #f1f1f1;
   padding: 20px 10px;
 }
-
+/* The header links */
 .header a {
   float: left;
   color: black;
@@ -45,17 +50,14 @@
   border-radius: 4px;
   margin-left: 20px;
   cursor: pointer;
+  float: right;
 }
-
+/*  The header links when hovered over*/
 .header a:hover {
   background-color: #ddd;
   color: black;
 }
-
-.header-right {
-  float: right;
-}
-
+/* The popup asking whether the shot was a goal or not */
 #popup {
   position: absolute;
   left: 50%;  
@@ -68,6 +70,7 @@
   display: none;
   cursor: pointer;
 }
+/* The buttons for the popup */
 button{
   height: 100%;
   width: 40%;
