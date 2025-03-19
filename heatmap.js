@@ -551,7 +551,7 @@ function addToHeatmap(x, y, coefficient, type){
       zShotValues[yPos-4][xPos+1]+=coefficient;
       zShotValues[yPos-4][xPos+2]+=coefficient;
     }
-    zShotValues = zShotValues.slice(0, xVals);
+    zShotValues = zShotValues.slice(0, yVals);
     for(let i = 0; i < yVals; i++){
       zShotValues[i].splice(xVals);
     }
@@ -643,7 +643,7 @@ function addToHeatmap(x, y, coefficient, type){
       zGoalValues[yPos-4][xPos+2]+=coefficient;
     }
     //get rid of the extra values
-    zGoalValues = zGoalValues.slice(0, xVals);
+    zGoalValues = zGoalValues.slice(0, yVals);
     for(let i = 0; i < yVals; i++){
       zGoalValues[i].splice(xVals);
     }
