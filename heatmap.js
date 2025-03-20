@@ -210,6 +210,7 @@ function draw() {
 
 //onclick, if the click is within the rink and there are no other pending shots, show the popup
 document.addEventListener("click", function(e) {
+  console.log(e.pageX-leftMargin, e.pageY);
   if(e.pageX < leftMargin+mapWidth*.01 || e.pageX > leftMargin+mapWidth*.99 || e.pageY < topMargin+mapHeight*.11 || e.pageY > topMargin+mapHeight*.92 || canvas.style.opacity == 1 || popup.style.display != "none"){
     return;
   }
@@ -226,7 +227,7 @@ document.addEventListener("click", function(e) {
 function addGoal(){
   goals.push(recentShot);
   //check which side the goal was on
-  if(recentShot[0] < leftMargin+365){
+  if(recentShot[0] < leftMargin+500){
     leftGoals++;
   }
   else{
@@ -257,7 +258,7 @@ function addGoal(){
 function addShot(){
   shots.push(recentShot);
   //check which side the shot was on
-  if(recentShot[0] < leftMargin+365){
+  if(recentShot[0] < leftMargin+500){
     leftShots++;
   }
   else{
@@ -297,7 +298,7 @@ function undo(){
   oldShots.push([shots[shots.length-1][0], shots[shots.length-1][1]]);
   //if the most recent goal matches the most recent shot, check what side it was on and check what zones it was in
   if(goals.length > 0 && shots[shots.length-1][0] == goals[goals.length-1][0] && shots[shots.length-1][1] == goals[goals.length-1][1]){
-    if(goals[goals.length-1] < leftMargin+365){
+    if(goals[goals.length-1] < leftMargin+500){
       leftShots--;
     }
     else{
@@ -319,7 +320,7 @@ function undo(){
       bigRedZoneRightGoals--;
     }
   }
-  if(shots[shots.length-1] < leftMargin+365){
+  if(shots[shots.length-1] < leftMargin+500){
     leftShots--;
   }
   else{
@@ -345,7 +346,7 @@ function redo(){
   if(oldGoals.length > 0 && oldShots[oldShots.length-1][0] == oldGoals[oldGoals.length-1][0] && oldShots[oldShots.length-1][1] == oldGoals[oldGoals.length-1][1]){
     goals.push(oldShots[oldShots.length-1]);
     //check which side the goal was on
-    if(oldShots[oldShots.length-1] < leftMargin+365){
+    if(oldShots[oldShots.length-1] < leftMargin+500){
       leftGoals++;
     }
     else{
@@ -372,7 +373,7 @@ function redo(){
   //add the shot back to the shot array
   shots.push(oldShots[oldShots.length-1]);
   //check which side the shot was on
-  if(oldShots[oldShots.length-1] < leftMargin+365){
+  if(oldShots[oldShots.length-1] < leftMargin+500){
     leftShots++;
   }
   else{
