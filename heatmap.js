@@ -298,11 +298,11 @@ function undo(){
   oldShots.push([shots[shots.length-1][0], shots[shots.length-1][1]]);
   //if the most recent goal matches the most recent shot, check what side it was on and check what zones it was in
   if(goals.length > 0 && shots[shots.length-1][0] == goals[goals.length-1][0] && shots[shots.length-1][1] == goals[goals.length-1][1]){
-    if(goals[goals.length-1] < leftMargin+500){
-      leftShots--;
+    if(goals[goals.length-1][0] < leftMargin+500){
+      leftGoals--;
     }
     else{
-      rightShots--;
+      rightGoals--;
     }
     goals.pop();
     if(turf.booleanPointInPolygon(turf.point([shots[shots.length-1][0], shots[shots.length-1][1]]), redZoneLeft)){
@@ -320,7 +320,7 @@ function undo(){
       bigRedZoneRightGoals--;
     }
   }
-  if(shots[shots.length-1] < leftMargin+500){
+  if(shots[shots.length-1][0] < leftMargin+500){
     leftShots--;
   }
   else{
@@ -346,7 +346,7 @@ function redo(){
   if(oldGoals.length > 0 && oldShots[oldShots.length-1][0] == oldGoals[oldGoals.length-1][0] && oldShots[oldShots.length-1][1] == oldGoals[oldGoals.length-1][1]){
     goals.push(oldShots[oldShots.length-1]);
     //check which side the goal was on
-    if(oldShots[oldShots.length-1] < leftMargin+500){
+    if(oldShots[oldShots.length-1][0] < leftMargin+500){
       leftGoals++;
     }
     else{
@@ -369,11 +369,13 @@ function redo(){
     else if(turf.booleanPointInPolygon(turf.point([oldShots[oldShots.length-1][0], oldShots[oldShots.length-1][1]]), bigRedZoneRight)){
       bigRedZoneRightGoals++;
     }
+    // remove the logged old goal since we've restored it
+    oldGoals.pop();
   }
   //add the shot back to the shot array
   shots.push(oldShots[oldShots.length-1]);
   //check which side the shot was on
-  if(oldShots[oldShots.length-1] < leftMargin+500){
+  if(oldShots[oldShots.length-1][0] < leftMargin+500){
     leftShots++;
   }
   else{
